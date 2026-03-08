@@ -1,0 +1,18 @@
+Q1: python ping_service.py 127.0.0.1; cat /etc/passwd
+Q2: The code has its first issue in line 14 where the parser reads the input. The parser.add_argument() should have a better sanitation when reading the user input. The second issue is in line 7 where the subprocess.check_output() sets shell=True flag. This is a major risk because it will reset the shell settings. This will cause a huge problem if someone wants to run malicious code.
+Q3: If you excaxtly want to use subprocess.check_output() method you should set shell flag "False". Then you should check that the input is a valid IP address.
+Q4: parser.add_argument("target", type=validate, help="IP address or DNS name of the target device")
+
+def validate(value):
+    try:
+        ipaddress.ip_address(value)
+    except ValueError:
+        raise ValueError("Invalid IP address!")
+    return value
+
+def ping_device(target):
+    command = ['ping','-c','4',target]
+    try:
+        output = subprocess.check_output(command, shell=False, stderr=subprocess.STDOUT)
+
+Q5:The input is validated as a real IP address before it is passed to the OS. Also the subprocess handles the whole input as a list which is more secure because every element on the list are separate arguments. Flag shell=True hepls prevents injections because the script doesn't have shell rights.
